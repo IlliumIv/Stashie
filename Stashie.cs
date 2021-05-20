@@ -58,6 +58,17 @@ namespace Stashie
                 case "switch_to_tab":
                     HandleSwitchToTabEvent(args);
                     break;
+                case "stashie_start":
+                    if (Core.ParallelRunner.FindByName("Stashie_DropItemsToStash") == null)
+                    {
+                        StartDropItemsToStashCoroutine();
+                    }
+                    else
+                    {
+                        StopCoroutine("Stashie_DropItemsToStash");
+                        StartDropItemsToStashCoroutine();
+                    }
+                    break;
                 default:
                     break;
             }
@@ -560,6 +571,7 @@ Everything else:	Rarity=Normal|Rarity=Magic|Rarity=Unique             			:9P_Dum
 
         private IEnumerator DropToStashRoutine()
         {
+            PublishEvent("stashie_started", null);
             var cursorPosPreMoving = Input.ForceMousePosition; //saving cursorposition
             //try stashing items 3 times
             var originTab = GetIndexOfCurrentVisibleTab();
@@ -586,6 +598,7 @@ Everything else:	Rarity=Normal|Rarity=Magic|Rarity=Unique             			:9P_Dum
             Input.SetCursorPos(cursorPosPreMoving);
             Input.MouseMove();
             StopCoroutine("Stashie_DropItemsToStash");
+            PublishEvent("stashie_finished", null);
         }
 
         private void CleanUp()
